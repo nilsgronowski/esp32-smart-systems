@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <esp32-hal-log.h>
+#include <Adafruit_NeoPixel.h>
 
 const int Button_Pin = 5;
 const int BUZZOR_OUTPUT_PIN = 2;
@@ -39,7 +40,7 @@ void loop()
 
   if (ButtonValue > 700 && ButtonValue < 800)
   {
-    setColor(255, 0, 0);   // Rot
+    setColor(255, 0, 0); // Rot
   }
   else if (ButtonValue > 1500 && ButtonValue < 1620)
   {
@@ -47,7 +48,7 @@ void loop()
   }
   else if (ButtonValue > 2350 && ButtonValue < 2450)
   {
-    setColor(0, 255, 0);   // Grün
+    setColor(0, 255, 0); // Grün
   }
   else if (ButtonValue > 1850 && ButtonValue < 1950)
   {
@@ -59,7 +60,7 @@ void loop()
   }
   else if (ButtonValue > 2500 && ButtonValue < 2600)
   {
-    setColor(0, 0, 255);   // Rot+Grün -> Blau
+    setColor(0, 0, 255); // Rot+Grün -> Blau
   }
   else
   {
