@@ -1,9 +1,9 @@
 #include <Arduino.h>
-#include <esp32-hal-log.h>
-#include <Adafruit_NeoPixel.h>
 #include <WiFi.h>
 #include <esp_now.h>
 #include <esp_mac.h>
+
+#define MONITORING_SPEED 115200
 
 constexpr uint8_t broadcast_address[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 constexpr unsigned long send_interval_ms = 1000;
@@ -14,7 +14,7 @@ struct __attribute__((packed)) broadcast_message
   char text[32];
 } message = {};
 
-void on_data_receive(const uint8_t *sender_address, const uint8_t *data, int length)
+void on_data_receive(const esp_now_recv_info_t *sender_address, const uint8_t *data, int length)
 {
   if (length != static_cast<int>(sizeof(broadcast_message)))
   {
@@ -29,7 +29,7 @@ void on_data_receive(const uint8_t *sender_address, const uint8_t *data, int len
   // received_message.text[sizeof(received_message.text) - 1] = '\0';
 
   Serial.printf("Received from " MACSTR " - sequence: %lu, payload: %.*s\n",
-                MAC2STR(sender_address),
+                MAC2STR(sender_address->src_addr),
                 static_cast<unsigned long>(received_message.sequence),
                 length - sizeof(uint32_t), received_message.text);
 }
@@ -69,10 +69,9 @@ bool espnow_setup()
 
 void setup()
 {
-  Serial.begin(MONITOR_SPEED);
+  Serial.begin(MONITORING_SPEED);
 
   WiFi.mode(WIFI_STA);
-  WiFi.begin();
   Serial.print("ESP-NOW sender MAC: ");
   Serial.println(WiFi.macAddress());
 
@@ -119,3 +118,15 @@ void loop()
 
   espnow_send();
 }
+/*
+Received from 80:b5:4e:e5:80:58 - sequence: 53, payload: Hello from ESP-NOW   53
+Broadcast sent: #13, Hello from ESP-NOW   13
+Received from 80:b5:4e:e5:80:58 - sequence: 54, payload: Hello from ESP-NOW   54
+Broadcast sent: #14, Hello from ESP-NOW   14
+Received from 80:b5:4e:e5:80:58 - sequence: 55, payload: Hello from ESP-NOW   5
+
+load:0x403c9700,len:0xbd8
+load:0x403cc700,len:0x2a0c
+entry 0x403c98d0
+ESP-NOW sender MAC: 34:85:18:74:70:0C
+Received from 80:b5:4e*/
